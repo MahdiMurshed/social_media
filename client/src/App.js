@@ -8,9 +8,11 @@ import { getPosts } from "./actions/posts";
 import { useEffect } from "react";
 
 function App() {
+  console.log("App.js");
   const classes = useStyle();
   const dispatch = useDispatch();
   useEffect(() => {
+    console.log("Dispatching getPosts()");
     dispatch(getPosts());
   }, [dispatch]);
   return (

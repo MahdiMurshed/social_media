@@ -7,6 +7,7 @@ import FileBase from "react-file-base64";
 import useStyles from "./styles";
 import { createPost, updatePost } from "../../actions/posts";
 const Form = () => {
+  console.log("Form.js");
   const [postData, setPostData] = useState({
     creator: "",
     title: "",
