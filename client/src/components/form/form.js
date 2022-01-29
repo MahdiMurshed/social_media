@@ -6,7 +6,7 @@ import FileBase from "react-file-base64";
 
 import useStyles from "./styles";
 import { createPost, updatePost } from "../../actions/posts";
-const Form = () => {
+const Form = ({ currentId, setCurrentId }) => {
   console.log("Form.js");
   const [postData, setPostData] = useState({
     creator: "",
@@ -17,14 +17,25 @@ const Form = () => {
   });
   const classes = useStyle();
   const dispatch = useDispatch();
+  const post = useSelector((state) =>
+    currentId ? state.posts.find((p) => p._id === currentId) : null
+  );
+  useEffect(() => {
+    if (post) setPostData(post);
+  }, [post]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    dispatch(createPost(postData));
+    if (currentId) {
+      dispatch(updatePost(currentId, postData));
+    } else {
+      dispatch(createPost(postData));
+    }
+    clear();
   };
 
   const clear = () => {
+    setCurrentId(null);
     setPostData({
       creator: "",
       title: "",
@@ -41,7 +52,9 @@ const Form = () => {
         className={`${classes.root} ${classes.form}`}
         onSubmit={handleSubmit}
       >
-        <Typography variant="h6">Creating a Memory</Typography>
+        <Typography variant="h6">
+          {currentId ? "Updating" : "Creating"} a Memory
+        </Typography>
         <TextField
           name="creator"
           variant="outlined"

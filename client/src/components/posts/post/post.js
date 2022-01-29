@@ -1,4 +1,5 @@
 import useStyle from "./styles";
+import { useDispatch } from "react-redux";
 import {
   Button,
   Card,
@@ -14,8 +15,11 @@ import {
   MoreHoriz,
   ThumbUpAltRounded,
 } from "@material-ui/icons";
-const Post = ({ post }) => {
+import { deletePost, likePost } from "../../../actions/posts";
+
+const Post = ({ post, setCurrentId }) => {
   const classes = useStyle();
+  const dispatch = useDispatch();
   return (
     <Card className={classes.card}>
       <CardMedia
@@ -30,7 +34,14 @@ const Post = ({ post }) => {
         </Typography>
       </div>
       <div className={classes.overlay2}>
-        <Button size="small" style={{ color: "white" }} onClick={() => {}}>
+        <Button
+          size="small"
+          style={{ color: "white" }}
+          onClick={() => {
+            setCurrentId(post._id);
+            console.log(post._id);
+          }}
+        >
           <MoreHoriz fontSize="default" />
         </Button>
       </div>
@@ -39,18 +50,33 @@ const Post = ({ post }) => {
           {post.tags.map((tag) => `#${tag} `)}
         </Typography>
       </div>
+      <Typography className={classes.title} variant="h5" gutterBottom>
+        {post.title}
+      </Typography>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="body2" color="textSecondary">
           {post.message}
         </Typography>
       </CardContent>
       <CardActions className={classes.CardActions}>
-        <Button size="small" color="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => {
+            dispatch(likePost(post._id));
+          }}
+        >
           <ThumbUpAltRounded fontSize="small" />
-          Like
+          &nbsp; Like &nbsp;
           {post.likeCount}
         </Button>
-        <Button size="small" color="primary" onClick={() => {}}>
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => {
+            dispatch(deletePost(post._id));
+          }}
+        >
           <DeleteOutlined size="small" />
           Delete
         </Button>
