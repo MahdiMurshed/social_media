@@ -10,7 +10,11 @@ export const getPosts = (req, res) => {
 export const createPost = (req, res) => {
   console.log("controller/posts.js: createPosts()");
   const post = req.body;
-  const newPost = new PostMessage(post);
+  const newPost = new PostMessage({
+    ...post,
+    creator: req.userId,
+    createdAt: new Date().toISOString(),
+  });
   newPost
     .save()
     .then((result) => res.status(201).json(result))
@@ -31,11 +35,19 @@ export const deletePost = (req, res) => {
 };
 export const likePost = async (req, res) => {
   const id = req.params.id;
+  if (!req.userId) {
+    return res.json({ message: "Unauthenticated" });
+  }
   const post = await PostMessage.findById(id);
-  const updatedPost = await PostMessage.findByIdAndUpdate(
-    id,
-    { likeCount: parseInt(post.likeCount) + 1 },
-    { new: true }
-  );
+  const index = post.likes.findIndex((id) => id === String(req.userId));
+
+  if (index === -1) {
+    post.likes.push(req.userId);
+  } else {
+    post.likes = post.likes.filter((id) => id !== String(req.userId));
+  }
+  const updatedPost = await PostMessage.findByIdAndUpdate(id, post, {
+    new: true,
+  });
   res.send(updatedPost);
 };
