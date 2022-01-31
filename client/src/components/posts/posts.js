@@ -21,14 +21,23 @@ import {
 
 const Posts = ({ setCurrentId }) => {
   const classes = useStyle();
-  const posts = useSelector((state) => state.posts);
+
+  //TODO
+  const { posts, isLoading } = useSelector((state) => {
+    console.log(state);
+    console.log(state.posts);
+    return state.posts;
+  });
   console.log(posts);
-  return !posts.length ? (
+  if (!posts.length && !isLoading) {
+    return <div>No posts</div>;
+  }
+  return isLoading ? (
     <CircularProgress />
   ) : (
     <Grid container spacing={3} alignItems="stretch">
-      {posts.map((post) => (
-        <Grid item xs={12} sm={6} key={post._id}>
+      {posts?.map((post) => (
+        <Grid item xs={12} sm={6} lg={3} key={post._id}>
           <Post post={post} setCurrentId={setCurrentId} />
         </Grid>
       ))}

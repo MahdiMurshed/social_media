@@ -1,11 +1,64 @@
 import PostMessage from "../models/postMessage.js";
-export const getPosts = (req, res) => {
-  console.log("controller/posts.js: getPosts()");
-  PostMessage.find()
-    .then((result) => {
-      res.status(200).json(result);
-    })
-    .catch((err) => res.status(404).json({ message: err.message }));
+export const getPosts = async (req, res) => {
+  const { page } = req.query;
+  try {
+    const LIMIT = 8;
+    const total = await PostMessage.countDocuments({});
+    const startingIndex = (Number(page) - 1) * LIMIT;
+    const posts = await PostMessage.find()
+      .sort({ _id: -1 })
+      .limit(LIMIT)
+      .skip(startingIndex);
+    res.status(200).json({
+      data: posts,
+      currentPage: Number(page),
+      numberOfPages: Math.ceil(total / LIMIT),
+    });
+  } catch (error) {
+    console.log("get posts error");
+  }
+};
+export const getPost = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await PostMessage.findById(id);
+    res.status(200).json(post);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// export const getPostsBySearch = async (req, res) => {
+//   console.log("get posts by search controller");
+//   const { searchQuery, tags } = req.query;
+//   console.log(searchQuery, tags);
+//   try {
+//     const title = new RegExp(searchQuery, "i");
+//     const post = await PostMessage.find({
+//       $or: [{ title }, { tags: { $in: tags.split(",") } }],
+//     });
+//     res.json({ data: post });
+//   } catch (error) {
+//     console.log("get posts by search controller error");
+//     console.log("search error");
+//   }
+// };
+export const getPostsBySearch = async (req, res) => {
+  console.log(req.query);
+  const { searchQuery, tags } = req.query;
+
+  try {
+    const title = new RegExp(searchQuery, "i");
+
+    const posts = await PostMessage.find({
+      $or: [{ title }, { tags: { $in: tags.split(",") } }],
+    });
+
+    res.json({ data: posts });
+  } catch (error) {
+    console.log("controller error");
+    res.status(404).json({ message: error.message });
+  }
 };
 export const createPost = (req, res) => {
   console.log("controller/posts.js: createPosts()");

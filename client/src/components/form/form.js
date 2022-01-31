@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button, Typography, Paper } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
 import FileBase from "react-file-base64";
+import { useHistory } from "react-router-dom";
 
 import useStyles from "./styles";
 import { createPost, updatePost } from "../../actions/posts";
@@ -16,9 +17,12 @@ const Form = ({ currentId, setCurrentId }) => {
   });
   const classes = useStyle();
   const dispatch = useDispatch();
-  const post = useSelector((state) =>
-    currentId ? state.posts.find((p) => p._id === currentId) : null
-  );
+  const history = useHistory();
+  const post = useSelector((state) => {
+    const { posts } = state.posts;
+
+    return currentId ? posts.find((p) => p._id === currentId) : null;
+  });
   const user = JSON.parse(localStorage.getItem("profile"));
   useEffect(() => {
     if (post) setPostData(post);
@@ -31,10 +35,19 @@ const Form = ({ currentId, setCurrentId }) => {
         updatePost(currentId, { ...postData, name: user?.result?.name })
       );
     } else {
-      dispatch(createPost({ ...postData, name: user?.result?.name }));
+      dispatch(createPost({ ...postData, name: user?.result?.name }, history));
     }
     clear();
   };
+  if (!user?.result?.name) {
+    return (
+      <Paper className={classes.paper} elevation={6}>
+        <Typography variant="h6" align="center">
+          Please Sign In to create your own memories and like other's memories.
+        </Typography>
+      </Paper>
+    );
+  }
 
   const clear = () => {
     setCurrentId(null);
