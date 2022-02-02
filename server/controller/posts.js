@@ -27,22 +27,6 @@ export const getPost = async (req, res) => {
     console.log(error);
   }
 };
-
-// export const getPostsBySearch = async (req, res) => {
-//   console.log("get posts by search controller");
-//   const { searchQuery, tags } = req.query;
-//   console.log(searchQuery, tags);
-//   try {
-//     const title = new RegExp(searchQuery, "i");
-//     const post = await PostMessage.find({
-//       $or: [{ title }, { tags: { $in: tags.split(",") } }],
-//     });
-//     res.json({ data: post });
-//   } catch (error) {
-//     console.log("get posts by search controller error");
-//     console.log("search error");
-//   }
-// };
 export const getPostsBySearch = async (req, res) => {
   console.log(req.query);
   const { searchQuery, tags } = req.query;
@@ -80,6 +64,21 @@ export const updatePost = (req, res) => {
     (result) => res.json(result)
   );
 };
+
+export const commentPost = async (req, res) => {
+  const { value } = req.body;
+  const id = req.params.id;
+  console.log(value);
+  console.log(id);
+  const post = await PostMessage.findById(id);
+  post.comments.push(value);
+  console.log("after push");
+
+  const newPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
+  console.log(newPost);
+  res.json(newPost);
+};
+
 export const deletePost = (req, res) => {
   const id = req.params.id;
   PostMessage.findByIdAndDelete(id).then((result) =>
