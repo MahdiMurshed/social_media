@@ -1,6 +1,6 @@
 # MERN-memory
 ------
-###Technology used :
+## Technology used :
 - MERN
 - Redux
 - Material-Ui
